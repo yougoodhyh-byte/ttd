@@ -160,3 +160,50 @@ h2 span {
     line-height: 1.8;
     color: #555;
 }
+/* 双语菜单栏 */
+
+nav ul li a {
+    text-align:center;
+    line-height:1.3;
+}
+
+
+nav ul li a small {
+
+    display:block;
+
+    color:#999;
+
+    font-size:11px;
+
+    font-weight:normal;
+
+    margin-top:3px;
+
+}
+
+
+/* Logo双语 */
+
+.logo {
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+
+.logo span {
+
+    display:block;
+
+    color:#999;
+
+    font-size:12px;
+
+    font-weight:normal;
+
+    margin-top:4px;
+
+}
