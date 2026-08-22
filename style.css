@@ -192,3 +192,26 @@ nav ul li a .en {
     margin-top:4px;
 
 }
+/* 所有中文标题下面显示英文 */
+
+h1 span,
+h2 span,
+h3 span,
+.logo span {
+    display: block;
+}
+
+
+/* 英文副标题统一样式 */
+
+h1 span,
+h2 span,
+h3 span,
+.logo span,
+small,
+.en {
+    color: #999;
+    font-size: 60%;
+    font-weight: normal;
+    margin-top: 6px;
+}
