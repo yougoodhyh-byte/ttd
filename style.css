@@ -50,3 +50,29 @@ section>h2 span{font-size:16px;margin-top:8px}
 .publication p{margin-bottom:25px;font-size:15px;line-height:1.9}
 .english{color:#999;font-size:.85em}
 footer{text-align:center;padding:30px;background:#102c46;color:white}
+
+.review-list{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:15px;
+
+margin-top:20px;
+
+}
+
+.review-list div{
+
+background:#fafafa;
+
+padding:12px;
+
+font-size:14px;
+
+line-height:1.5;
+
+border-left:2px solid #d1c4e9;
+
+}
