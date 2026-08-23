@@ -64,14 +64,9 @@ margin-top:20px;
 }
 
 .review-list div{
-
-    background:#fafafa;
-
-    padding:12px;
-
-    font-size:14px;
-
-    line-height:1.5;
+    padding:4px 0;
+    font-size:13px;
+    line-height:1.35;
 
     border-left:none !important;
 
