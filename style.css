@@ -445,14 +445,22 @@ footer{
 
     width:100%;
 
-    background:#102c46;
+    background:rgba(255,255,255,0.85);
+
+    backdrop-filter:blur(12px);
+
+    -webkit-backdrop-filter:blur(12px);
 
     padding:10px 0;
+
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
 }
 
 
-.dropdown:hover .dropdown-menu{
+/* 手机端点击后显示 */
+
+.dropdown.active .dropdown-menu{
 
     display:block;
 
