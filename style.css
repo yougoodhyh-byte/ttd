@@ -162,7 +162,7 @@ margin-top:20px;
 
 .dropdown-menu{
 
-    display:none !important;
+    display:none;
 
     position:absolute;
 
@@ -170,7 +170,11 @@ margin-top:20px;
 
     left:0;
 
-    background:#102c46;
+    background:rgba(255,255,255,0.88);
+
+    backdrop-filter:blur(12px);
+
+    -webkit-backdrop-filter:blur(12px);
 
     min-width:200px;
 
@@ -180,8 +184,9 @@ margin-top:20px;
 
     z-index:9999;
 
-}
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
 
+}
 
 .dropdown:hover .dropdown-menu{
 
