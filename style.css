@@ -89,7 +89,25 @@ display:flex;
 gap:25px;
 }
 
-.card,.publication{
+/* 研究方向卡片 */
+
+.card{
+
+    background:#fafafa;
+
+    padding:25px;
+
+    border-left:3px solid #d9e2ec;
+
+    flex:1;
+
+}
+
+
+
+/* 论文区域 */
+
+.publication{
 
     background:#fafafa;
 
@@ -102,7 +120,6 @@ gap:25px;
     margin:0 auto;
 
 }
-
 h3 span{
 font-size:0.6em;
 }
