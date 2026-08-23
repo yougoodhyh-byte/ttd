@@ -131,3 +131,16 @@ footer span{
 color:#aaa;
 font-size:12px;
 }
+
+/* 强制所有一级栏目标题左对齐 */
+
+section h2 {
+    text-align:left !important;
+    margin-left:0;
+}
+
+
+section h2 span {
+    display:block;
+    text-align:left;
+}
