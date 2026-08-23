@@ -251,12 +251,8 @@ margin-top:20px;
     color:#999;
 
 }
-    /* 工作论文取消左侧竖线 */
-
 #working-papers{
-
-    border-left:none;
-
+    border-left:3px solid #d9e2ec;
 }
 /* =========================
    Mobile Responsive Design
@@ -459,12 +455,8 @@ footer{
 
 }
 
-    /* 工作论文取消左侧竖线 */
-
 #working-papers{
-
-    border-left:none;
-
+    border-left:3px solid #d9e2ec;
 }
 
 }
