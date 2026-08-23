@@ -13,7 +13,7 @@ section>h2 span{font-size:16px;margin-top:8px}
 .cards{display:flex;gap:25px}
 .card{background:#fafafa;padding:25px;border-left:3px solid #d9e2ec;flex:1}
 .publication{background:#fafafa;padding:35px;border-left:3px solid #d9e2ec;width:100%}
-..publication h3{
+.publication h3{
 
     font-size:22px;
 
