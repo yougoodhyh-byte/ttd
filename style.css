@@ -460,8 +460,7 @@ footer{
 
 .dropdown.active .dropdown-menu{
 
-    display:block;
-
+display:block !important;
 }
 
 
