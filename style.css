@@ -81,7 +81,31 @@ nav a{
 
     background:#f4f7fb;
 
-    padding:90px 12% 70px;
+    padding:70px 12% 50px;
+
+}
+
+
+.hero h1{
+
+    margin-bottom:20px;
+
+}
+
+
+.hero h2{
+
+    margin-top:0;
+
+    margin-bottom:20px;
+
+}
+
+
+.hero h1 span,
+.hero h2 span{
+
+    margin-top:5px;
 
 }
 section{padding:40px 12%}
