@@ -3,7 +3,7 @@ body{margin:0;font-family:"Microsoft YaHei",Arial,sans-serif;color:#12304a;line-
 header{background:#102c46;padding:18px 12%}
 nav{display:flex;justify-content:space-between;align-items:center}
 .logo{color:white;font-size:22px;font-weight:bold}
-.logo span,nav small,h1 span,h2 span,h3 span{display:block;color:#999;font-weight:normal}
+.logo span,nav small,h1 span,h2 span,h3 span,h4 span{display:block;color:#999;font-weight:normal}
 nav ul{display:flex;gap:35px;list-style:none}
 nav a{color:white;text-decoration:none;text-align:center}
 .hero{background:#f4f7fb;padding:70px 12%}
