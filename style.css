@@ -1,12 +1,46 @@
 *{box-sizing:border-box}
-body{margin:0;font-family:"Microsoft YaHei",Arial,sans-serif;color:#12304a;line-height:1.8}
-header{background:#102c46;padding:18px 12%}
+body{
+
+    margin:0;
+
+    padding-top:90px;
+
+    font-family:"Microsoft YaHei",Arial,sans-serif;
+
+    color:#12304a;
+
+    line-height:1.8;
+
+}
+header{
+
+    background:#102c46;
+
+    padding:18px 12%;
+
+    position:fixed;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    z-index:1000;
+
+}
 nav{display:flex;justify-content:space-between;align-items:center}
 .logo{color:white;font-size:22px;font-weight:bold}
 .logo span,nav small,h1 span,h2 span,h3 span,h4 span{display:block;color:#999;font-weight:normal}
 nav ul{display:flex;gap:35px;list-style:none}
 nav a{color:white;text-decoration:none;text-align:center}
-.hero{background:#f4f7fb;padding:70px 12%}
+.hero{
+
+    background:#f4f7fb;
+
+    padding:90px 12% 70px;
+
+}
 section{padding:40px 12%}
 section>h2{text-align:left;font-size:32px;font-weight:normal;margin:70px 0 35px}
 section>h2 span{font-size:16px;margin-top:8px}
@@ -72,13 +106,26 @@ margin-top:20px;
 
 }
 
-/* 手机端适配 */
-@media (max-width:768px){
+/* =========================
+   Mobile Responsive Design
+   ========================= */
+
+@media screen and (max-width:768px){
 
 
-/* 导航栏 */
+body{
+
+    padding-top:120px;
+
+    overflow-x:hidden;
+
+}
+
+
 header{
-    padding:15px 5%;
+
+    padding:15px 20px;
+
 }
 
 
@@ -86,52 +133,71 @@ nav{
 
     flex-direction:column;
 
-    gap:15px;
+    align-items:flex-start;
+
+}
+
+
+.logo{
+
+    font-size:20px;
 
 }
 
 
 nav ul{
 
+    width:100%;
+
     display:flex;
 
     flex-wrap:wrap;
 
-    justify-content:center;
-
-    gap:15px;
+    gap:10px 18px;
 
     padding:0;
+
+    margin-top:10px;
 
 }
 
 
-/* 首页 */
+nav a{
+
+    font-size:13px;
+
+}
+
+
 .hero{
 
-    padding:40px 6%;
+    padding:50px 20px 40px;
+
+}
+
+
+h1{
+
+    font-size:30px;
 
 }
 
 
 section{
 
-    padding:30px 6%;
+    padding:30px 20px;
 
 }
 
 
-/* 标题 */
 section>h2{
 
-    font-size:26px;
+    font-size:28px;
 
     margin:40px 0 25px;
 
 }
 
-
-/* 研究方向卡片 */
 
 .cards{
 
@@ -147,41 +213,59 @@ section>h2{
 }
 
 
-
-/* 论文、项目模块 */
-
 .publication{
+
+    width:100%;
 
     padding:20px;
 
 }
 
 
+.publication p{
 
-/* 审稿列表 */
+    overflow-wrap:anywhere;
+
+    word-break:break-word;
+
+    line-height:1.7;
+
+}
+
+
+a{
+
+    overflow-wrap:anywhere;
+
+    word-break:break-word;
+
+}
+
 
 .review-list{
 
     grid-template-columns:1fr;
 
-    row-gap:8px;
+    row-gap:5px;
 
 }
 
 
 .review-list div{
 
+    padding:5px 0;
+
     font-size:14px;
 
 }
 
 
-
-/* 联系方式 */
-
 footer{
 
     padding:20px;
+
+}
+
 
 }
 
