@@ -65,12 +65,14 @@ margin-top:20px;
 
 .review-list div{
 
-background:#fafafa;
+    background:#fafafa;
 
-padding:12px;
+    padding:12px;
 
-font-size:14px;
+    font-size:14px;
 
-line-height:1.5;
+    line-height:1.5;
+
+    border-left:none !important;
 
 }
