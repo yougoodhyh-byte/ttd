@@ -452,6 +452,13 @@ footer{
 
 }
 
+    /* 工作论文取消左侧竖线 */
+
+#working-papers{
+
+    border-left:none;
+
+}
 
 }
 
