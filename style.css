@@ -268,7 +268,55 @@ footer{
 
 }
 
+/* 手机端下拉菜单 */
+
+.dropdown-menu{
+
+    position:static;
+
+    display:none;
+
+    width:100%;
+
+    background:#102c46;
+
+    padding:10px 0;
 
 }
 
 
+.dropdown:hover .dropdown-menu{
+
+    display:block;
+
+}
+
+
+.dropdown-menu li{
+
+    padding:0;
+
+}
+
+
+.dropdown-menu a{
+
+    display:block;
+
+    padding:8px 15px;
+
+    text-align:left;
+
+    white-space:nowrap;
+
+}
+
+
+.dropdown-menu small{
+
+    color:#aaa;
+
+}
+
+
+}
