@@ -436,6 +436,13 @@ footer{
 }
 
 /* 手机端下拉菜单 */
+    .dropdown:hover .dropdown-menu{
+    display:none !important;
+}
+
+.dropdown.active:hover .dropdown-menu{
+    display:block !important;
+}
 
 .dropdown-menu{
 
@@ -458,9 +465,8 @@ footer{
 }
 
 
-.dropdown.active .dropdown-menu{
-
-display:block !important;
+.dropdown:hover .dropdown-menu{
+    display:none !important;
 }
 
 
