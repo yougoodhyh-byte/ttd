@@ -14,7 +14,11 @@ body{
 }
 header{
 
-    background:#102c46;
+    background:rgba(16,44,70,0.88);
+
+    backdrop-filter:blur(10px);
+
+    -webkit-backdrop-filter:blur(10px);
 
     padding:18px 12%;
 
