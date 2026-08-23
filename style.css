@@ -445,24 +445,38 @@ footer{
 
     width:100%;
 
-    background:rgba(255,255,255,0.85);
+    background:rgba(255,255,255,0.75) !important;
 
-    backdrop-filter:blur(12px);
+    backdrop-filter:blur(15px);
 
-    -webkit-backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(15px);
 
     padding:10px 0;
 
-    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
 
 }
 
 
-/* 手机端点击后显示 */
-
 .dropdown.active .dropdown-menu{
 
     display:block;
+
+}
+
+
+.dropdown-menu a{
+
+    color:#12304a;
+
+    padding:10px 15px;
+
+}
+
+
+.dropdown-menu small{
+
+    color:#777;
 
 }
 
