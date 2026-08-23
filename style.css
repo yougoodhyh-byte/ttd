@@ -107,7 +107,80 @@ margin-top:20px;
     border-left:none !important;
 
 }
+/* =========================
+   Desktop Dropdown Menu
+   ========================= */
 
+
+.dropdown{
+
+    position:relative;
+
+}
+
+
+.dropdown-menu{
+
+    display:none !important;
+
+    position:absolute;
+
+    top:100%;
+
+    left:0;
+
+    background:#102c46;
+
+    min-width:200px;
+
+    padding:10px 0;
+
+    list-style:none;
+
+    z-index:9999;
+
+}
+
+
+.dropdown:hover .dropdown-menu{
+
+    display:block !important;
+
+}
+
+
+.dropdown-menu li{
+
+    list-style:none;
+
+}
+
+
+.dropdown-menu a{
+
+    display:block;
+
+    padding:10px 20px;
+
+    text-align:left;
+
+    white-space:nowrap;
+
+}
+
+
+.dropdown-menu a:hover{
+
+    background:#1d4668;
+
+}
+
+
+.dropdown-menu small{
+
+    color:#999;
+
+}
 /* =========================
    Mobile Responsive Design
    ========================= */
@@ -321,82 +394,3 @@ footer{
 
 }
 
-/* =========================
-   Dropdown Menu
-   ========================= */
-
-.dropdown{
-
-    position:relative;
-
-}
-
-
-/* 默认隐藏二级菜单 */
-
-.dropdown-menu{
-
-    display:none;
-
-    position:absolute;
-
-    top:100%;
-
-    left:0;
-
-    background:#102c46;
-
-    min-width:200px;
-
-    padding:10px 0;
-
-    list-style:none;
-
-    z-index:9999;
-
-}
-
-
-/* 鼠标放到一级标题时显示 */
-
-.dropdown:hover .dropdown-menu{
-
-    display:block;
-
-}
-
-
-/* 二级菜单格式 */
-
-.dropdown-menu li{
-
-    list-style:none;
-
-}
-
-
-.dropdown-menu a{
-
-    display:block;
-
-    padding:10px 20px;
-
-    text-align:left;
-
-    white-space:nowrap;
-
-}
-
-
-.dropdown-menu a:hover{
-
-    background:#1d4668;
-
-}
-
-
-.dropdown-menu small{
-
-    color:#999;
-
-}
