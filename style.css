@@ -14,11 +14,11 @@ body{
 }
 header{
 
-    background:rgba(16,44,70,0.88);
+    background:rgba(255,255,255,0.82);
 
-    backdrop-filter:blur(10px);
+    backdrop-filter:blur(12px);
 
-    -webkit-backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(12px);
 
     padding:18px 12%;
 
@@ -32,12 +32,33 @@ header{
 
     z-index:9999;
 
-    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
 
 }
 nav{display:flex;justify-content:space-between;align-items:center}
-.logo{color:white;font-size:22px;font-weight:bold}
-.logo span,nav small,h1 span,h2 span,h3 span,h4 span{display:block;color:#999;font-weight:normal}
+.logo{
+
+    color:#12304a;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+.logo span,
+nav small,
+h1 span,
+h2 span,
+h3 span,
+h4 span{
+
+    display:block;
+
+    color:#777;
+
+    font-weight:normal;
+
+}
 nav > ul{
 
 display:flex;
@@ -47,7 +68,15 @@ gap:35px;
 list-style:none;
 
 }
-nav a{color:white;text-decoration:none;text-align:center}
+nav a{
+
+    color:#12304a;
+
+    text-decoration:none;
+
+    text-align:center;
+
+}
 .hero{
 
     background:#f4f7fb;
