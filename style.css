@@ -71,3 +71,119 @@ margin-top:20px;
     border-left:none !important;
 
 }
+
+/* 手机端适配 */
+@media (max-width:768px){
+
+
+/* 导航栏 */
+header{
+    padding:15px 5%;
+}
+
+
+nav{
+
+    flex-direction:column;
+
+    gap:15px;
+
+}
+
+
+nav ul{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+    gap:15px;
+
+    padding:0;
+
+}
+
+
+/* 首页 */
+.hero{
+
+    padding:40px 6%;
+
+}
+
+
+section{
+
+    padding:30px 6%;
+
+}
+
+
+/* 标题 */
+section>h2{
+
+    font-size:26px;
+
+    margin:40px 0 25px;
+
+}
+
+
+/* 研究方向卡片 */
+
+.cards{
+
+    flex-direction:column;
+
+}
+
+
+.card{
+
+    width:100%;
+
+}
+
+
+
+/* 论文、项目模块 */
+
+.publication{
+
+    padding:20px;
+
+}
+
+
+
+/* 审稿列表 */
+
+.review-list{
+
+    grid-template-columns:1fr;
+
+    row-gap:8px;
+
+}
+
+
+.review-list div{
+
+    font-size:14px;
+
+}
+
+
+
+/* 联系方式 */
+
+footer{
+
+    padding:20px;
+
+}
+
+
+}
