@@ -49,3 +49,38 @@ button:disabled{opacity:.6;cursor:wait!important}
 .ttd-history-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #edf0f3;padding:12px 0;font-size:14px}
 .ttd-preview-text{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:14px;max-height:50dvh;overflow:auto;padding:12px;border:1px solid #d9e2ec}
 @media(max-width:768px){.ttd-item{display:block}.ttd-item-controls{justify-content:flex-start;margin-top:10px;max-width:none}.ttd-item-controls button{min-height:42px}.ttd-admin-actions button{min-height:42px}.ttd-toolbar{max-height:35dvh;overflow:auto}.ttd-toolbar button{flex:1 0 20%}}
+
+/* Module batch editor: CSS is isolated from the homepage content. */
+.ttd-batch{width:min(1080px,calc(100vw - 24px));max-height:92dvh;overscroll-behavior:contain}
+.ttd-batch .ttd-dialog-head h2{overflow-wrap:anywhere;min-width:0}
+.ttd-batch-tools{padding:0 0 16px;border-bottom:1px solid #d9e2ec}
+.ttd-batch-tools label{font-size:13px}.ttd-batch-tools .ttd-admin-actions{margin:10px 0}
+.ttd-batch-tools details{font-size:13px;border:1px solid #e3e8ef;border-radius:7px;padding:10px 12px}
+.ttd-batch-tools summary{cursor:pointer}
+.ttd-batch-tools textarea{width:100%;box-sizing:border-box;border:1px solid #d9e2ec;border-radius:7px;padding:10px;font:inherit;resize:vertical;min-height:100px}
+.ttd-batch-tools details button{margin-top:12px}
+.ttd-batch-row{border:1px solid #d9e2ec;border-radius:10px;padding:16px;margin:16px 0;background:#fafbfd;scroll-margin:15px}
+.ttd-batch-row-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.ttd-batch-row-head strong{font-size:14px;min-width:0;overflow-wrap:anywhere;font-weight:500}
+.ttd-batch-row-head button{flex-shrink:0}
+.ttd-batch-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ttd-batch-fields>div{min-width:0}.ttd-batch-fields .ttd-rich{min-height:88px;max-height:340px;overflow:auto}
+.ttd-batch-fields label{font-size:13px}
+.ttd-batch-deleted{background:#fff8f8;border-style:dashed}
+.ttd-batch-row-note{margin:5px 0 0;min-height:0}
+.ttd-batch-footer{position:sticky;bottom:-25px;padding:10px 0 0;background:#fff;border-top:1px solid #d9e2ec;z-index:1}
+.ttd-batch-footer p{margin:0 0 5px}.ttd-batch-footer .ttd-dialog-actions{margin-top:8px;padding:10px 0;border-top:0}
+.ttd-batch-footer #ttd-batch-count{font-weight:500;color:#12304a}
+.ttd-batch button[data-batch-format]{min-height:36px}
+.ttd-item-controls button[data-command=batch]{background:#f1edf7;border-color:#cbbadf}
+@media(max-width:768px){
+  .ttd-batch{padding:14px;max-height:94dvh}.ttd-batch .ttd-dialog-head h2{font-size:19px}
+  .ttd-batch-row{padding:12px}.ttd-batch-fields{grid-template-columns:1fr;gap:0}
+  .ttd-batch-fields .ttd-rich{min-height:75px;font-size:16px}
+  .ttd-batch input:not([type=checkbox]),.ttd-batch select,.ttd-batch textarea{font-size:16px}
+  .ttd-batch-footer{bottom:-14px}.ttd-batch-footer .ttd-dialog-actions{justify-content:stretch;gap:6px}
+  .ttd-batch-footer .ttd-dialog-actions button{flex:1;padding:8px;font-size:12px}
+  .ttd-batch button{min-height:42px}.ttd-batch-row-head{gap:6px}
+}
+
+.ttd-batch [hidden]{display:none!important}

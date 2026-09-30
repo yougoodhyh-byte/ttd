@@ -1,3 +1,4 @@
+import { initBatch } from './batch.js?v=20261001.1';
 import { clean, fragment, decorate, splitBlock, setBlock, serialize, targetChoices, textOf } from './editor.js?v=20260930.2';
 import { outline, findEntry, deleteEntry, moveEntry, transferEntry, updateCaptionLinks } from './structure.js?v=20260930.2';
 const labels = { section:'一级栏目', subsection:'二级栏目', card:'卡片', group:'分组 / 年份', navigation:'导航', item:'内容' };
@@ -31,8 +32,9 @@ export function initAdmin(api) {
     <div class="ttd-dialog-actions"><button type="button" data-admin-close="ttd-move">取消</button><button type="button" id="ttd-move-save" class="ttd-primary">移动并同步</button></div>
   </dialog>`);
   let historyOffset=0, historyRows=[], preview=null, move=null;
+  const batch = initBatch({...api, onSaved(text) { refreshContents(); status(text); }});
   const status = (text, error=false, id='ttd-manager-status') => { $(id).textContent=text; $(id).classList.toggle('ttd-error',error); };
-  const ready = () => { const s=api.state(); if (!s.page || !s.user) throw new Error('请先登录。'); if (s.saving || s.editor) throw new Error('请先完成当前编辑。'); return s; };
+  const ready = () => { const s=api.state(); if (!s.page || !s.user) throw new Error('请先登录。'); if (s.saving || s.editor || batch.isOpen()) throw new Error('请先完成当前编辑。'); return s; };
   function busy(value) { api.setBusy(value); document.querySelectorAll('#ttd-manager button,#ttd-history button,#ttd-history-preview button,#ttd-move button').forEach(b=>{b.disabled=value;}); }
   async function action(fn, success, id='ttd-manager-status') {
     let ticket;
@@ -62,7 +64,7 @@ export function initAdmin(api) {
       const controls=document.createElement('div'); controls.className='ttd-item-controls';
       const addButton=(label,command)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.command=command;b.setAttribute('aria-label',label+'：'+entry.label.slice(0,65));controls.append(b);};
       addButton('编辑','edit');
-      if (['section','subsection','card','group'].includes(entry.kind)) addButton('在此新增','add');
+      if (['section','subsection','card','group'].includes(entry.kind)) { addButton('批量编辑','batch'); addButton('在此新增','add'); }
       addButton('上移','up'); addButton('下移','down');
       if (entry.kind==='item' && entry.el.matches('p,.review-list>div')) addButton('移动到','transfer');
       addButton(['section','subsection','card','group'].includes(entry.kind)?'整组删除':'删除','delete');
@@ -80,6 +82,7 @@ export function initAdmin(api) {
   $('ttd-items').onclick=event=>{
     const cmd=event.target.closest('[data-command]'),row=cmd?.closest('[data-key]');if(!cmd||!row||api.state().saving)return;
     const entry=findEntry(api.state().root,row.dataset.key); if(!entry)return;
+    if(cmd.dataset.command==='batch'){batch.open(entry.key);return;}
     if(cmd.dataset.command==='edit'){if(entry.heading)api.edit(entry.heading);return;}
     if(cmd.dataset.command==='add'){openAdd(entry);return;}
     if(cmd.dataset.command==='transfer'){
@@ -163,6 +166,6 @@ export function initAdmin(api) {
   for(const b of document.querySelectorAll('[data-admin-close]')) b.onclick=()=>{if(!api.state().saving)$(b.dataset.adminClose).close();};
   for(const id of ['ttd-manager','ttd-history','ttd-history-preview','ttd-move']) $(id).addEventListener('cancel',e=>{if(api.state().saving)e.preventDefault();});
   $('ttd-scope').onchange=refreshContents;$('ttd-search').oninput=refreshContents;
-  button.onclick=()=>{if(!api.state().page)return;$('ttd-manager').showModal();status('可编辑正文，也可管理整栏、卡片和年份分组。');refreshContents();};
-  return {refreshContents,reset(){historyRows=[];preview=null;move=null;historyOffset=0;for(const id of ['ttd-items','ttd-history-list','ttd-preview-info','ttd-preview-text','ttd-manager-status','ttd-history-status','ttd-preview-status','ttd-move-status'])$(id).replaceChildren();$('ttd-scope').replaceChildren();$('ttd-search').value='';$('ttd-import-file').value='';busy(false);}};
+  button.onclick=()=>{if(!api.state().page)return;$('ttd-manager').showModal();status('点击模块旁的“批量编辑”，可同时修改或新增多条，一次保存。');refreshContents();};
+  return {refreshContents,hasDraft:batch.isOpen,reset(){batch.reset();historyRows=[];preview=null;move=null;historyOffset=0;for(const id of ['ttd-items','ttd-history-list','ttd-preview-info','ttd-preview-text','ttd-manager-status','ttd-history-status','ttd-preview-status','ttd-move-status'])$(id).replaceChildren();$('ttd-scope').replaceChildren();$('ttd-search').value='';$('ttd-import-file').value='';busy(false);}};
 }

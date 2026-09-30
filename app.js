@@ -1,4 +1,4 @@
-import { initAdmin } from './admin.js?v=20260930.2';
+import { initAdmin } from './admin.js?v=20261001.1';
 import { updateCaptionLinks } from './structure.js?v=20260930.2';
 import { Cloud, SESSION_KEY } from './cloud.js';
 import { clean, fragment, decorate, splitBlock, setBlock, pairNode, serialize, targetChoices, insertContent, textOf, translationParts } from './editor.js?v=20260930.2';
@@ -108,7 +108,7 @@ $('ttd-login').addEventListener('submit', async event => {
   finally { $('ttd-password').value = ''; $('ttd-login-submit').disabled = false; }
 });
 $('ttd-logout').onclick = async () => {
-  if ((editor || saving) && !confirm('退出会放弃尚未保存的编辑，确定退出吗？')) return;
+  if ((editor || saving || admin?.hasDraft()) && !confirm('退出会放弃尚未保存的编辑，确定退出吗？')) return;
   const signOut = cloud.signOut(); lock('已退出。此设备不再显示主页内容。');
   await signOut.catch(() => message('ttd-login-status','本机已退出；网络异常导致云端会话撤销未确认。'));
 };
@@ -118,7 +118,7 @@ $('ttd-edit-toggle').onclick = () => {
   sync(on ? '点击需要修改的文字；每次保存都会同步云端。' : '云端已连接');
 };
 function openEditor(el = null, titleOnly = false) {
-  if (!page || saving) return;
+  if (!page || saving || admin?.hasDraft()) return;
   const initial = titleOnly ? { zh: page.title, en: '', pending: false } : el ? splitBlock(el, root) : { zh: '', en: '', pending: false };
   editor = { ...initial, id: el?.dataset.ttdId, titleOnly, baseVersion: page.version, targets: targetChoices(root), englishEdited: false };
   $('ttd-editor-title').textContent = titleOnly ? '修改网页标题' : el ? '编辑内容' : '新增内容';
@@ -277,9 +277,9 @@ async function refreshPage(force = false) {
   try {
     const metadata = await cloud.page(true); if (ticket !== generation) return;
     if (String(metadata.version) === String(page.version)) { if (force) sync('当前已是最新云端版本'); return; }
-    if (editor) { sync('另一设备有更新；当前编辑已保留，保存时会检查冲突。', true); return; }
+    if (editor || admin?.hasDraft()) { sync('另一设备有更新；当前编辑已保留，保存时会检查冲突。', true); return; }
     const expectedVersion=page.version; const next = await cloud.page();
-    if (ticket === generation && !editor && !saving && page.version===expectedVersion && Number(next.version)>Number(page.version)) render(next);
+    if (ticket === generation && !editor && !saving && !admin?.hasDraft() && page.version===expectedVersion && Number(next.version)>Number(page.version)) render(next);
   } catch (error) { if (ticket === generation) handleError('ttd-sync',error); }
 }
 $('ttd-refresh').onclick = () => refreshPage(true);
@@ -289,7 +289,7 @@ window.addEventListener('pageshow', event => {
   if (event.persisted) { lock('正在重新验证登录…'); if (cloud.readSession()) openPage(); }
 });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshPage(); });
-window.addEventListener('beforeunload', event => { if (editor || saving) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', event => { if (editor || saving || admin?.hasDraft()) { event.preventDefault(); event.returnValue = ''; } });
 window.addEventListener('storage', event => {
   if (event.key !== SESSION_KEY) return;
   if (!event.newValue) lock('此浏览器的账号已退出，请重新登录。');
