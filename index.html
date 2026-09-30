@@ -7,8 +7,8 @@
 <meta name="referrer" content="no-referrer">
 <title>私有主页 · 请登录</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="private.css">
-<script type="module" src="app.js"></script>
+<link rel="stylesheet" href="private.css?v=20260930.2">
+<script type="module" src="app.js?v=20260930.2"></script>
 </head>
 <body class="ttd-locked">
 <div id="ttd-auth" class="ttd-auth">
@@ -36,15 +36,15 @@
 <div class="ttd-dialog-head"><h2 id="ttd-editor-title">编辑内容</h2><button type="button" data-close="ttd-editor" aria-label="关闭编辑窗口">×</button></div>
 <div id="ttd-add-options" hidden>
 <label for="ttd-target">所属栏目</label><select id="ttd-target"></select>
-<div class="ttd-columns"><div><label for="ttd-kind">内容类型</label><select id="ttd-kind"><option value="paragraph">正文 / 论文 / 课题 / 课程</option><option value="heading">分组标题 / 年份</option><option value="review">同行评审期刊</option><option value="card">新卡片 / 课程分类</option><option value="section">新一级栏目（自动加入导航）</option></select></div><div><label for="ttd-placement">插入位置</label><select id="ttd-placement"><option value="end">本组末尾</option><option value="start">本组开头</option></select></div></div>
+<div class="ttd-columns"><div><label for="ttd-kind">内容类型</label><select id="ttd-kind"><option value="paragraph">正文 / 论文 / 课题 / 课程</option><option value="heading">分组标题 / 年份</option><option value="review">同行评审期刊</option><option value="card">新卡片 / 课程分类</option><option value="subsection">新二级栏目</option><option value="section">新一级栏目（自动加入导航）</option></select></div><div><label for="ttd-placement">插入位置</label><select id="ttd-placement"><option value="end">本组末尾</option><option value="start">本组开头</option></select></div></div>
 </div>
 <div class="ttd-format" aria-label="文字格式"><span>格式：</span><button type="button" data-format="bold"><b>加粗</b></button><button type="button" data-format="italic"><i>斜体</i></button><button type="button" data-format="createLink">链接</button><button type="button" data-format="removeFormat">清除格式</button></div>
 <label id="ttd-zh-label" for="ttd-zh">中文 / 原文</label><div id="ttd-zh" class="ttd-rich" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ttd-zh-label"></div>
 <label class="ttd-check"><input id="ttd-auto-en" type="checkbox" checked>中文变化时自动更新英文（手动修改的英文优先保留）</label>
 <label id="ttd-en-label" for="ttd-en">英文</label><div id="ttd-en" class="ttd-rich ttd-english-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ttd-en-label"></div>
-<p class="ttd-help">纯英文文献、年份、邮箱、DOI 不会被重复翻译。可直接编辑英文；不需要双语的内容可取消勾选。</p>
+<p class="ttd-help">纯英文文献、年份、邮箱、DOI 不会被重复翻译。可直接编辑英文；不需要双语可取消勾选。翻译服务未就绪时仍保存原文，并标记英文待更新。</p>
 <p id="ttd-editor-status" class="ttd-message" role="status" aria-live="polite"></p>
-<div class="ttd-dialog-actions"><button id="ttd-delete" type="button" class="ttd-danger">删除本条</button><button id="ttd-up" type="button">上移</button><button id="ttd-down" type="button">下移</button><button id="ttd-zh-only" type="button" hidden>仅保存原文，英文待更新</button><button type="button" data-close="ttd-editor">取消</button><button id="ttd-save" type="submit" class="ttd-primary">保存并同步</button></div>
+<div class="ttd-dialog-actions"><button id="ttd-delete" type="button" class="ttd-danger">删除本条</button><button id="ttd-up" type="button">上移</button><button id="ttd-down" type="button">下移</button><button id="ttd-zh-only" type="button">先保存原文</button><button type="button" data-close="ttd-editor">取消</button><button id="ttd-save" type="submit" class="ttd-primary">保存并同步</button></div>
 </form>
 </dialog>
 <dialog id="ttd-settings" class="ttd-dialog" aria-labelledby="ttd-settings-title">

@@ -1,28 +1,43 @@
-# Private, editable homepage
+# 私有主页：Supabase 云端数据与网页内容管理
 
-GitHub Pages serves only the login UI and application code. The original `style.css` is unchanged. Homepage text lives in the isolated `ttd_pages` table in the connected Supabase project, not in this repository. Existing research-workbench tables are not modified.
+## 日常使用
 
-## Use
+主页正文保存在 Supabase 的 `ttd_pages` 中，不再从公开 HTML 或仓库中的初始数据文件读取。使用原来绑定的账号和密码登录；未开放注册，其他账号无法读取或修改这份主页。原有 `style.css` 未改动。
 
-Sign in with the existing account bound to the homepage (the password is unchanged). No registration or public read fallback is offered. Choose **编辑内容** and click text to edit Chinese/original text and English. Choose **新增内容** for paragraphs, publications by year, courses, reviewer records, cards, or new sections. New sections are added to navigation. **保存并同步** saves to the cloud; other signed-in devices refresh automatically or via **刷新**. Version checks prevent concurrent edits from silently overwriting each other. Network/translation errors keep the editor open.
+登录后点击底部的 **内容管理**，可按栏目筛选或搜索中英文。每条记录提供编辑、删除及排序入口；栏目、卡片和年份分组有“在此新增”和“整组删除”。一级栏目、二级栏目、研究方向卡片、论文年份分组、课题、课程、评审记录、导航和页脚文字均可从网页维护，无需去 GitHub 编辑内容。
 
-## English updates
+**新增内容**支持正文、论文、课题、课程、评审期刊、年份分组、卡片、一级栏目和二级栏目。新增栏目会加入导航；栏目标题的编辑会同步对应导航。整组移动或删除会包含该组下属内容。课题原有的中英文配对段落一起移动、删除。正文和课程条目可通过“移动到”调整所属栏目。
 
-Changed Chinese is translated on save; English citations, numbers, and DOI strings are not independently translated. Manually revised English takes precedence. Compatible desktop browsers can enable their built-in Translator API. Other browsers, including phones, need a cloud translation key configured once in **翻译设置**. Choose DeepSeek or OpenAI and enter that provider's API key there, not in GitHub or chat. Translation sends the edited text to that provider and may incur its normal API charges. No provider key is preconfigured. A failed translation never silently leaves old English presented as current: the explicit original-only fallback marks English as pending. Existing saved English remains available without any translation subscription.
+**保存并同步**直接更新 Supabase。其他登录设备自动检查更新，也可点“刷新”。保存带版本条件，防止旧页面静默覆盖另一设备的新内容。网络错误会保留编辑窗口中的未保存文字。
 
-## Security and deployment
+## 历史版本与备份
 
-- `config.js` contains only a publishable connection key. No service-role or provider secret belongs in frontend code.
-- `ttd_pages`: RLS owner-only SELECT and UPDATE; browser column grants permit only title/body updates. INSERT, DELETE, owner transfer, and direct version changes are not permitted. The version/timestamp trigger is SECURITY INVOKER.
-- `ttd_translation_credentials`: RLS enabled, no browser grants or policies. The Edge Function encrypts provider keys with AES-GCM, authenticates via the live Auth user endpoint, and checks ownership via the caller's RLS-scoped query before any service-role access. Status responses never return keys or ciphertext.
-- The Edge Function is deployed with gateway `verify_jwt=false` because it performs its own live user and ownership verification, including for asymmetric access tokens. This is not an unauthenticated endpoint. Do not remove those checks.
-- The function uses built-in Supabase environment secrets. Optional `TTD_ENCRYPTION_KEY` can provide a dedicated encryption secret. When using the fallback, rotating the service-role key requires entering the provider key again. Do not change the encryption secret without migrating stored keys.
-- The browser keeps its authentication session, but not the homepage body, in localStorage. Logout clears page/editor contents and invalidates the local session. Saved HTML passes an allowlist sanitizer; scripts, event attributes, embedded resources, and unsafe links are excluded.
-- Static assets use relative paths compatible with `/ttd/`. Existing sharing/QR and visitor-counter behavior is retained after login. Shared URLs never grant authorization or contain a token.
-- No private seed, account password, or homepage backup is included in this repository. Do not add such files in future commits.
+本次升级在云端保留了升级前的完整快照，没有覆盖已有正文。此后，每次主页更新前，由数据库触发器自动保存旧版本；触发器为 SECURITY INVOKER，历史表启用 RLS。绑定账号可以读取历史，其他账号和未登录访问被拒绝；浏览器不能直接插入、篡改或删除历史版本。
 
-**Historical visibility:** this repository was public before migration. Removing text from the current site does not remove earlier commits, caches, forks, or copies. This update does not rewrite Git history or change repository visibility. New cloud edits are not written to GitHub history.
+在 **内容管理 → 历史版本** 可预览、恢复旧内容，误删不必去仓库恢复。恢复会创建新版本，原来的当前版本仍会保留。历史列表分页加载。
 
-## Verification
+**导出备份**导出本站 JSON 格式的完整主页内容，不包含密码或翻译密钥。**导入备份**先验证格式和显示预览，确认后才恢复；同样会检查云端版本。备份含私有正文，请妥善保存，不要放入公开仓库。
 
-`node --check app.js`, `node --check cloud.js`, `node --check editor.js` and `node --test tests/translation.test.mjs` require Node.js 22+. The Edge tests use synthetic mocked services, not live account passwords or billable translation calls. Separate local Chromium DOM checks cover editing, multiline project pairs, year-group insertion, translation fallback, save conflicts, logout clearing, and mobile dialogs. Those checks mock network/storage; they are not a claim of live password-login or paid-provider verification. Database-role tests were run against the live isolated tables in a rollback-only transaction.
+## 英文更新
+
+中文内容变更后，保存时尝试更新对应英文；手动填写的英文优先。纯英文引用不会重复翻译。新增、删除、移动均由网页完成，不以翻译服务可用为前提。
+
+本次检查时没有配置云端翻译密钥。需要在 **翻译设置** 中选择 DeepSeek 或 OpenAI，并填写对应服务的 API 密钥一次；后续由同一账号的设备共用。密钥在 Edge Function 服务端加密保存，不写入 GitHub，也不回显。待翻译文字会发送到所选服务，调用可能产生该服务的费用。支持内置 Translator API 的电脑也可在网页启用本机翻译；不保证所有电脑或手机浏览器支持。
+
+服务未配置或翻译失败时，仍然保存原文，并明确标记“英文待更新”，不会把旧译文当成已经更新。可在 **内容管理 → 补齐待更新英文** 重试，每次最多处理 20 条；也可逐条手动编辑英文。不需要双语的条目可以取消自动英文选项。已保存的英文不依赖翻译服务即可查看。
+
+## 安全边界
+
+前端仅包含 publishable key。正文、历史快照和翻译配置均在 Supabase；账号密码、service-role key、供应商密钥不在本仓库。`ttd_pages` 的 browser UPDATE grants 仅允许改 title/body，不允许转移 owner 或更改版本。翻译 Edge Function 对每次请求实时验证用户和主页权限，再访问服务端加密配置。`verify_jwt=false` 表示由函数内部验证，不是允许匿名访问。
+
+退出会清除当前正文、编辑窗口、管理列表和历史预览。本地仅保存认证会话，不缓存正文。HTML 渲染采用允许列表，去除脚本、事件属性和危险链接。导入备份也先清理内容。应用资源采用相对路径，继续适用于 `/ttd/`，没有更改既有 GitHub Pages 部署方式。
+
+原有分享功能保留，但分享网址不会赋予访问权限，仍须登录绑定账号。原有访问量脚本仍在登录后加载。
+
+**旧公开历史仍需注意：** 仓库在迁移前曾公开。当前数据移入 Supabase 不会消除已有 Git 提交、外部缓存、分叉或他人副本。本次没有改仓库可见性，也没有重写历史。新的网页内容修改不会写回公开 GitHub 仓库。
+
+## 验证范围
+
+2026-09-30：30 项 Chromium 交互回归检查通过，使用合成主页、模拟账号及内存网络响应，覆盖权限界面、内容编辑、整栏/年份/中英文配对管理、跨组移动、冲突与网络失败、翻译成功及失败、历史恢复、备份导入导出、手机视口和退出清理。这些不是实际账号密码登录或实际付费翻译调用的证明。
+
+Node.js 22 语法检查通过；`node --test tests/translation.test.mjs` 的翻译端点合成测试通过。真实 Supabase 数据库使用回滚事务验证了历史自动归档、绑定账号访问、非绑定账号/匿名拒绝，以及历史直接写入和篡改拒绝。测试结束后核对云端正文仍为原版本，且与升级前快照完全一致。

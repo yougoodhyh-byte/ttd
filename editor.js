@@ -1,7 +1,7 @@
 // Treat saved markup as untrusted: no scripts, event handlers, styles, embeds or remote resources.
 const tags = new Set('HEADER NAV DIV SPAN UL OL LI A SMALL BUTTON SECTION H1 H2 H3 H4 P BR EM FOOTER STRONG B I U S SUB SUP INPUT'.split(' '));
 const inline = new Set('DIV SPAN BR EM STRONG B I U S SUB SUP A'.split(' '));
-const dataAttrs = new Set(['data-ttd-id','data-ttd-pair','data-ttd-pair-en','data-ttd-en','data-ttd-footer','data-ttd-pending']);
+const dataAttrs = new Set(['data-ttd-node','data-ttd-id','data-ttd-pair','data-ttd-pair-en','data-ttd-en','data-ttd-footer','data-ttd-pending']);
 export function safeURL(value) { return /^(https?:\/\/|mailto:|#[A-Za-z][\w-]*$)/i.test(value.trim()); }
 export function clean(html, richOnly = false) {
   const template = document.createElement('template');
@@ -66,7 +66,10 @@ export function setBlock(el, root, zh, en, pending = false) {
   }
 }
 export function decorate(root) {
-  const selector = 'header .logo,header nav a,section h1,section h2,section h3,section h4,section p,.review-list>div,[data-ttd-footer]';
+  root.querySelectorAll('section,.publication,.card,.review-list').forEach(el => {
+    if (!el.dataset.ttdNode) el.dataset.ttdNode = 'node-' + crypto.randomUUID();
+  });
+  const selector = 'header .logo,header nav a,section h1,section h2,section h3,section h4,section p,footer p,.review-list>div,[data-ttd-footer]';
   root.querySelectorAll(selector).forEach(el => {
     if (el.dataset.ttdPairEn) return;
     if (!el.dataset.ttdId) el.dataset.ttdId = 'block-' + crypto.randomUUID();
@@ -87,32 +90,55 @@ export function serialize(root) {
   return clean(clone.innerHTML);
 }
 export function targetChoices(root) {
-  const targets = [...root.querySelectorAll('section,.publication,.card,.review-list,#publication>h4')];
+  const targets = [...root.querySelectorAll('section,.publication,.card,.review-list,section h4,footer')];
   return targets.map((el, index) => {
     const h = el.querySelector(':scope>h1,:scope>h2,:scope>h3,:scope>h4');
-    const label = el.tagName === 'H4' ? '论文发表 / ' + el.textContent : h ? splitBlock(h, root).zh.replace(/<[^>]*>/g,'') : '同行评审期刊';
+    const base = h ? textOf(splitBlock(h, root).zh) : el.tagName === 'FOOTER' ? '页脚' : '同行评审列表';
+    const parent = el.closest('section');
+    const parentTitle = parent?.querySelector(':scope>h1,:scope>h2');
+    const prefix = parentTitle && parent !== el ? textOf(splitBlock(parentTitle,root).zh) + ' / ' : '';
+    const label = prefix + (el.tagName === 'H4' ? textOf(splitBlock(el,root).zh) : base);
     return { el, value: String(index), label: label.trim() };
   });
 }
 export function insertContent(root, target, kind, zh, en, pending, placement = 'end') {
+  if (!['section','subsection','card','heading','review','paragraph'].includes(kind)) throw new Error('不支持的内容类型。');
+  if (target?.tagName === 'H4' && ['card','subsection','heading'].includes(kind)) target = target.parentElement;
+  if (target?.matches('.review-list') && kind === 'paragraph') kind = 'review';
+  if (kind !== 'section' && !target) throw new Error('请先选择所属栏目。');
   let item = document.createElement(kind === 'heading' ? 'h4' : kind === 'review' ? 'div' : 'p');
   if (kind === 'section') {
     const section = document.createElement('section'); section.id = 'custom-' + crypto.randomUUID();
     item = document.createElement('h2'); section.append(item);
     const nav = document.createElement('a'); nav.href = '#' + section.id; setBlock(nav, root, zh, en, pending);
-    const li = document.createElement('li'); li.append(nav); root.querySelector('header nav>ul')?.append(li);
+    const li = document.createElement('li'); li.append(nav); let menu = root.querySelector('header nav>ul');
+    if (!menu) throw new Error('导航结构缺失，请从历史版本恢复。');
+    menu.append(li);
     root.insertBefore(section, root.querySelector('footer'));
+  } else if (kind === 'subsection') {
+    const section = target.closest('section');
+    if (!section) throw new Error('二级栏目需要放在一级栏目中。');
+    const group = document.createElement('div'); group.className = 'publication'; group.id = 'custom-' + crypto.randomUUID();
+    item = document.createElement('h3'); item.className = 'sub-title'; group.append(item);
+    if (placement === 'start') section.insertBefore(group, [...section.children].find(e => !/^H[1-2]$/.test(e.tagName)) || null); else section.append(group);
+    const parentLink = [...root.querySelectorAll('header nav a')].find(a => a.getAttribute('href') === '#' + section.id);
+    if (parentLink?.closest('li')) {
+      const owner = parentLink.closest('li'); owner.classList.add('dropdown');
+      let menu = owner.querySelector(':scope>ul'); if (!menu) { menu=document.createElement('ul'); menu.className='dropdown-menu'; owner.append(menu); }
+      const link=document.createElement('a'); link.href='#'+group.id; setBlock(link,root,zh,en,pending);
+      const li=document.createElement('li'); li.append(link); placement==='start' ? menu.prepend(li) : menu.append(li);
+    }
   } else if (kind === 'card') {
     let cards = target.matches('.cards') ? target : target.querySelector(':scope>.cards');
     if (!cards) { cards = document.createElement('div'); cards.className = 'cards'; target.append(cards); }
     const card = document.createElement('div'); card.className = 'card'; item = document.createElement('h3'); card.append(item);
-    cards.append(card);
+    placement === 'start' ? cards.prepend(card) : cards.append(card);
   } else {
     if (kind === 'review') target = target.matches('.review-list') ? target : target.querySelector('.review-list');
     if (!target) throw new Error('请在“同行评审期刊”栏目新增期刊记录。');
     if (target.tagName === 'H4') {
       let next = target.nextElementSibling;
-      if (placement !== 'start') while (next && next.tagName !== 'H4') next = next.nextElementSibling;
+      if (placement !== 'start') while (next && !/^H[1-4]$/.test(next.tagName)) next = next.nextElementSibling;
       target.parentElement.insertBefore(item, next);
     } else if (placement === 'start') {
       const first = [...target.children].find(e => !/^H[1-3]$/.test(e.tagName));

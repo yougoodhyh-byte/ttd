@@ -1,9 +1,12 @@
+import { initAdmin } from './admin.js?v=20260930.2';
+import { updateCaptionLinks } from './structure.js?v=20260930.2';
 import { Cloud, SESSION_KEY } from './cloud.js';
-import { clean, fragment, decorate, splitBlock, setBlock, pairNode, serialize, targetChoices, insertContent, textOf, translationParts } from './editor.js';
+import { clean, fragment, decorate, splitBlock, setBlock, pairNode, serialize, targetChoices, insertContent, textOf, translationParts } from './editor.js?v=20260930.2';
 const $ = id => document.getElementById(id);
 const cloud = new Cloud();
 let page = null, user = null, editor = null, generation = 0, saving = false, translationStatus = null, translator = null;
 const root = $('site-root');
+let admin = null;
 function message(id, text, error = false) { $(id).textContent = text; $(id).classList.toggle('ttd-error', error); }
 function sync(text, error = false) { message('ttd-sync', text, error); }
 function setBusy(value) {
@@ -14,6 +17,7 @@ function setBusy(value) {
 function lock(text = '请使用现有云端账号登录。') {
   generation++; page = null; user = null; editor = null; translationStatus = null;
   translator?.destroy?.(); translator = null;
+  admin?.reset();
   root.replaceChildren(); root.hidden = true;
   document.querySelectorAll('dialog[open]').forEach(d => d.close());
   $('ttd-zh').replaceChildren(); $('ttd-en').replaceChildren(); $('ttd-target').replaceChildren(); $('ttd-api-key').value = '';
@@ -25,7 +29,7 @@ function lock(text = '请使用现有云端账号登录。') {
   setBusy(false); message('ttd-login-status', text);
 }
 function handleError(id, error) {
-  if (error.status === 401 || (page && (!cloud.readSession() || cloud.readSession().expires_at <= Date.now() / 1000))) { lock('登录已失效，请重新登录。'); return; }
+  if (error.status === 401 || error.status === 403 || (page && (!cloud.readSession() || cloud.readSession().expires_at <= Date.now() / 1000))) { lock('登录已失效，请重新登录。'); return; }
   message(id, error.message || '操作失败，请重试。', true);
 }
 const scripts = new Map();
@@ -78,6 +82,7 @@ function render(next) {
   if (counter && previousCount) counter.textContent = previousCount;
   const pending = root.querySelectorAll('[data-ttd-pending=true]').length;
   sync('云端已同步 · ' + new Date(next.updated_at).toLocaleString() + (pending ? ' · 有英文待更新' : ''));
+  admin?.refreshContents();
 }
 async function openPage() {
   const ticket = ++generation;
@@ -119,7 +124,7 @@ function openEditor(el = null, titleOnly = false) {
   $('ttd-editor-title').textContent = titleOnly ? '修改网页标题' : el ? '编辑内容' : '新增内容';
   $('ttd-add-options').hidden = !!el || titleOnly; $('ttd-zh').innerHTML = clean(initial.zh, true); $('ttd-en').innerHTML = clean(initial.en, true);
   $('ttd-en').hidden = titleOnly; $('ttd-en-label').hidden = titleOnly; $('ttd-auto-en').closest('label').hidden = titleOnly;
-  $('ttd-auto-en').checked = true; $('ttd-zh-only').hidden = true;
+  $('ttd-auto-en').checked = true; $('ttd-zh-only').hidden = titleOnly;
   const movable = !!el && (el.tagName === 'P' || el.parentElement?.classList.contains('review-list'));
   for (const id of ['ttd-delete','ttd-up','ttd-down']) $(id).hidden = !movable;
   const select = $('ttd-target'); select.replaceChildren();
@@ -178,6 +183,7 @@ async function getLocalTranslator(statusID = 'ttd-editor-status') {
 }
 async function translateHTML(html) {
   const parts = translationParts(html); if (!parts.segments.length) return '';
+  if (!translationStatus && !window.Translator) translationStatus = await cloud.translate({action:'status'});
   let results;
   if (!translationStatus?.configured && window.Translator) {
     const local = await getLocalTranslator(); results = [];
@@ -197,17 +203,25 @@ async function commit(zhOnly = false) {
   if (!editor || saving || !page) return;
   const ctx = editor, ticket = generation; setBusy(true);
   try {
-    const zh = clean($('ttd-zh').innerHTML,true); let en = clean($('ttd-en').innerHTML,true), pending = false;
+    const zh = clean($('ttd-zh').innerHTML,true); let en = clean($('ttd-en').innerHTML,true), pending = false, translationWarning = '';
+    const chinese = /[\u3400-\u9fff]/.test(textOf(zh));
     if (!textOf(zh)) throw new Error('请填写内容；删除已有条目请使用“删除本条”。');
     const changed = clean(ctx.zh,true) !== zh;
     if (ctx.titleOnly && textOf(zh).length > 200) throw new Error('网页标题不能超过 200 个字符。');
     if (!ctx.titleOnly && !zhOnly && (changed || ctx.pending) && /[\u3400-\u9fff]/.test(textOf(zh)) && $('ttd-auto-en').checked && !ctx.englishEdited) {
       message('ttd-editor-status','正在更新英文…');
       try { en = await translateHTML(zh); }
-      catch (error) { $('ttd-zh-only').hidden = false; throw error; }
+      catch (error) {
+        if (error.status === 401 || error.status === 403) throw error;
+        en = ''; pending = true; translationWarning = error.message || '翻译暂不可用';
+      }
       if (ticket !== generation) return;
       $('ttd-en').innerHTML = en;
-    } else if (zhOnly) { en = ''; pending = true; }
+    } else if (zhOnly) { en = ''; pending = chinese; }
+    else if (changed && !ctx.englishEdited) {
+      if (!chinese) en = '';
+      else if (!$('ttd-auto-en').checked) { en = ''; pending = false; }
+    }
     if (ticket !== generation) return;
     message('ttd-editor-status','正在保存到云端…');
     const snapshot = fragment(serialize(root));
@@ -216,11 +230,7 @@ async function commit(zhOnly = false) {
         const el = snapshot.querySelector('[data-ttd-id="' + CSS.escape(ctx.id) + '"]');
         if (!el) throw new Error('原条目已改变，请重新打开编辑。');
         setBlock(el, snapshot, zh, en, pending);
-        // Keep a section's navigation caption in step with explicitly edited section headings.
-        if (/^H[23]$/.test(el.tagName) && el.parentElement.id && el.parentElement.id !== 'home') {
-          const nav = snapshot.querySelector('header a[href="#' + CSS.escape(el.parentElement.id) + '"]');
-          if (nav) setBlock(nav, snapshot, zh, en, pending);
-        }
+        updateCaptionLinks(snapshot, el, zh, en, pending);
       } else {
         const targets = targetChoices(snapshot); const target = targets[Number($('ttd-target').value)]?.el;
         if (!target && $('ttd-kind').value !== 'section') throw new Error('请先选择所属栏目。');
@@ -229,6 +239,10 @@ async function commit(zhOnly = false) {
     }
     if (await persist(snapshot, ctx.titleOnly ? textOf(zh) : page.title, ctx.baseVersion, ticket)) {
       editor = null; $('ttd-editor').close(); $('ttd-zh').replaceChildren(); $('ttd-en').replaceChildren();
+      if (translationWarning) {
+        sync('原文已保存到云端；英文待更新。请在翻译设置配置服务，或从内容管理补齐。',true);
+        message('ttd-manager-status','原文已保存。英文待更新：'+translationWarning,true);
+      }
     }
   } catch (error) { handleError('ttd-editor-status', error); }
   finally { if (ticket === generation) setBusy(false); }
@@ -264,7 +278,8 @@ async function refreshPage(force = false) {
     const metadata = await cloud.page(true); if (ticket !== generation) return;
     if (String(metadata.version) === String(page.version)) { if (force) sync('当前已是最新云端版本'); return; }
     if (editor) { sync('另一设备有更新；当前编辑已保留，保存时会检查冲突。', true); return; }
-    const next = await cloud.page(); if (ticket === generation && !editor && !saving) render(next);
+    const expectedVersion=page.version; const next = await cloud.page();
+    if (ticket === generation && !editor && !saving && page.version===expectedVersion && Number(next.version)>Number(page.version)) render(next);
   } catch (error) { if (ticket === generation) handleError('ttd-sync',error); }
 }
 $('ttd-refresh').onclick = () => refreshPage(true);
@@ -314,4 +329,7 @@ $('ttd-local-translation').onclick = async () => {
   try { await getLocalTranslator('ttd-settings-status'); if (ticket === generation) message('ttd-settings-status','本机翻译已就绪。中文变化后会自动生成英文并一起保存到云端。'); }
   catch (error) { if (ticket === generation) message('ttd-settings-status', error.message, true); }
 };
+admin = initAdmin({
+  state:()=>({page,user,root,generation,saving,editor}), cloud, edit:openEditor, persist, translate:translateHTML, setBusy, error:handleError
+});
 if (cloud.readSession()) { message('ttd-login-status','正在验证已有登录…'); openPage(); }
